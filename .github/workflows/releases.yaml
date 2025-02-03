@@ -24,7 +24,7 @@ jobs:
 
       - name: Run build script
         run: |
-          python build.py --clean  # Call your build script
+          python build.py --clean
         shell: cmd
 
       - name: Create GitHub Release
