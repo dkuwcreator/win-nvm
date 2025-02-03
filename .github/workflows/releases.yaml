@@ -1,0 +1,40 @@
+name: Build and Release wnvm
+
+on:
+  push:
+    tags:
+      - "v*.*.*"  # Triggers on versioned tags (e.g., v1.0.0)
+
+jobs:
+  build:
+    runs-on: windows-latest  # Ensure Windows for `.exe` builds
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt  # Ensure dependencies are installed
+
+      - name: Run build script
+        run: |
+          python build.py --clean  # Call your build script
+        shell: cmd
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Release ${{ github.ref_name }}"
+          body: "Automated release of wnvm version ${{ github.ref_name }}."
+          draft: false
+          prerelease: false
+          files: dist/wnvm.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
