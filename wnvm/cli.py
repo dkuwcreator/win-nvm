@@ -216,5 +216,37 @@ def remove(version: str):
     typer.echo(f"✔ Node.js v{version} removed.")
 
 
+GITHUB_REPO = "dkuwcreator/win-nvm"
+VERSION_FILE = Path(__file__).parent / ".version"
+
+def fetch_latest_version():
+    """Retrieve the latest version from GitHub releases."""
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        return response.json()["tag_name"].lstrip("v")
+    except requests.RequestException:
+        return None  # Fail gracefully if the request fails
+
+@app.command()
+def version():
+    """Show the wnvm CLI version and check for updates."""
+    # Read local version
+    if VERSION_FILE.exists():
+        local_version = VERSION_FILE.read_text().strip()
+    else:
+        local_version = "Unknown"
+
+    typer.echo(f"wnvm version {local_version}")
+
+    # Fetch the latest release from GitHub
+    latest_version = fetch_latest_version()
+
+    if latest_version and latest_version != local_version:
+        typer.echo(f"⚠ A new version ({latest_version}) is available!")
+        typer.echo("Update by running:")
+        typer.echo("  iwr -useb https://raw.githubusercontent.com/dkuwcreator/win-nvm/main/install.ps1 | iex")
+        
 if __name__ == "__main__":
     app()

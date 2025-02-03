@@ -15,7 +15,17 @@ ENTRY_SCRIPT = config.get("ENTRY_SCRIPT", "example/cli.py")
 OUTPUT_NAME = config.get("OUTPUT_NAME", "example_output")
 DIST_DIR = config.get("DIST_DIR", "dist")
 
+# Define the version (ideally, retrieve it dynamically from tags)
+VERSION = "0.0.0"  # This will be replaced by the build pipeline
+
+# Write the version to a file
+version_file = Path("wnvm/.version")
+version_file.write_text(VERSION)
+
+print(f"✔ Wrote version {VERSION} to {version_file}")
+
 app = typer.Typer()
+
 
 def is_package_installed(package_name: str) -> bool:
     """Check if a Python package is installed."""
@@ -30,6 +40,7 @@ def is_package_installed(package_name: str) -> bool:
     except (FileNotFoundError, subprocess.CalledProcessError):
         return False
 
+
 def clean():
     """Remove previous build artifacts and reinstall dependencies."""
     cwd = Path(__file__).parent
@@ -37,7 +48,9 @@ def clean():
     dist_dir = cwd / DIST_DIR
     spec_file = cwd / f"{PROJECT_NAME}.spec"
     venv_dir = cwd / ".venv"
-    python_executable = venv_dir / ("Scripts" if platform.system() == "Windows" else "bin") / "python"
+    python_executable = (
+        venv_dir / ("Scripts" if platform.system() == "Windows" else "bin") / "python"
+    )
 
     if build_dir.exists():
         shutil.rmtree(build_dir)
@@ -49,15 +62,33 @@ def clean():
 
     if venv_dir.exists():
         print("Reinstalling dependencies in virtual environment...")
-        subprocess.run([python_executable, "-m", "pip", "install", "-r", cwd / "requirements.txt", "--no-cache-dir"], check=True)
+        subprocess.run(
+            [
+                python_executable,
+                "-m",
+                "pip",
+                "install",
+                "-r",
+                cwd / "requirements.txt",
+                "--no-cache-dir",
+            ],
+            check=True,
+        )
         print("Reinstalled dependencies.")
 
+
 @app.command()
-def build(clean_before: bool = typer.Option(False, "--clean", help="Clean build artifacts before building")):
+def build(
+    clean_before: bool = typer.Option(
+        False, "--clean", help="Clean build artifacts before building"
+    )
+):
     """Build the project into a standalone executable."""
     cwd = Path(__file__).parent
     venv_dir = cwd / ".venv"
-    python_executable = venv_dir / ("Scripts" if platform.system() == "Windows" else "bin") / "python"
+    python_executable = (
+        venv_dir / ("Scripts" if platform.system() == "Windows" else "bin") / "python"
+    )
 
     if clean_before:
         clean()
@@ -68,18 +99,32 @@ def build(clean_before: bool = typer.Option(False, "--clean", help="Clean build 
         print(".venv created successfully.")
 
     print("Installing dependencies inside the virtual environment...")
-    subprocess.run([python_executable, "-m", "pip", "install", "-r", cwd / "requirements.txt"], check=True)
+    subprocess.run(
+        [python_executable, "-m", "pip", "install", "-r", cwd / "requirements.txt"],
+        check=True,
+    )
 
     print(f"Building {OUTPUT_NAME} for {platform.system()}...")
-    cmd = [python_executable, "-m", "PyInstaller", "--onefile", "--name", OUTPUT_NAME, ENTRY_SCRIPT]
+    cmd = [
+        python_executable,
+        "-m",
+        "PyInstaller",
+        "--onefile",
+        "--name",
+        OUTPUT_NAME,
+        ENTRY_SCRIPT,
+    ]
 
     try:
         subprocess.run(cmd, check=True)
         print(f"Build completed. Executable is in the '{DIST_DIR}' folder.")
     except subprocess.CalledProcessError as e:
         print("Error: The build process failed.")
-        print("Check the output above for details and ensure your entry script is correct.")
+        print(
+            "Check the output above for details and ensure your entry script is correct."
+        )
         raise e
+
 
 if __name__ == "__main__":
     app()

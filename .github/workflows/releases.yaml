@@ -30,6 +30,9 @@ jobs:
           python build.py --clean
         shell: cmd
 
+      - name: Write Version File
+        run: echo "${{ github.ref_name }}" > wnvm/.version
+      
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
