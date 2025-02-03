@@ -5,6 +5,9 @@ on:
     tags:
       - "v*.*.*"  # Triggers on versioned tags (e.g., v1.0.0)
 
+permissions:
+  contents: write  # Grant permission to create releases
+
 jobs:
   build:
     runs-on: windows-latest  # Ensure Windows for `.exe` builds
