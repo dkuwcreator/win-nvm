@@ -13,6 +13,8 @@ SESSION_CWD = Path(__file__).parent
 ENTRY_SCRIPT = config.get("ENTRY_SCRIPT", "example/cli.py")
 OUTPUT_NAME = config.get("OUTPUT_NAME", "example_output")
 DIST_DIR = SESSION_CWD / config.get("DIST_DIR", "dist")
+VERSION_FILE = SESSION_CWD / ".version"
+SOURCE_FILE = SESSION_CWD / ENTRY_SCRIPT
 
 VENV_DIR = SESSION_CWD / ".venv"  # Using `.venv` for consistency
 PYTHON_EXECUTABLE = (
@@ -23,6 +25,28 @@ PYTHON_EXECUTABLE = (
 
 app = typer.Typer()
 
+
+def get_version():
+    """Retrieve the version from the .version file."""
+    if VERSION_FILE.exists():
+        return VERSION_FILE.read_text().strip().lstrip("v")
+    return "Unknown"
+
+
+def inject_version():
+    """Inject version number into the script before building."""
+    version = get_version()
+    if version == "Unknown":
+        return
+
+    original_code = SOURCE_FILE.read_text()
+    updated_code = original_code.replace(
+        '__version__ = "dev"', f'__version__ = "{version}"'
+    )
+
+    SOURCE_FILE.write_text(updated_code)
+
+
 def clean():
     """Remove previous build artifacts."""
     build_dir = SESSION_CWD / "build"
@@ -32,6 +56,7 @@ def clean():
         if path.exists():
             shutil.rmtree(path) if path.is_dir() else path.unlink()
     print("Cleaned previous build artifacts.")
+
 
 def setup_venv():
     """Ensure a virtual environment exists and install dependencies (for local builds)."""
@@ -44,6 +69,7 @@ def setup_venv():
         [str(PYTHON_EXECUTABLE), "-m", "pip", "install", "-r", "requirements.txt"],
         check=True,
     )
+
 
 @app.command()
 def build(
@@ -65,6 +91,8 @@ def build(
     # Determine which Python executable to use
     python_exec = "python" if ci else str(PYTHON_EXECUTABLE)
 
+    inject_version()
+
     print(f"Building {OUTPUT_NAME} for {platform.system()}...")
     cmd = [
         python_exec,
@@ -73,7 +101,7 @@ def build(
         "--onefile",
         "--name",
         OUTPUT_NAME,
-        ENTRY_SCRIPT,  # FIXED: Correctly referencing the entry script
+        ENTRY_SCRIPT,
     ]
 
     try:
@@ -82,6 +110,7 @@ def build(
     except subprocess.CalledProcessError as e:
         print("Error: Build process failed.")
         raise e
+
 
 if __name__ == "__main__":
     app()

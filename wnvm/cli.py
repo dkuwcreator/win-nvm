@@ -11,6 +11,8 @@ from InquirerPy.base.control import Choice
 
 app = typer.Typer()
 
+__version__ = "dev"  # Placeholder, will be replaced by build.py
+
 WNVM_DIR = Path.home() / "wnvm"
 VERSIONS_DIR = WNVM_DIR / "versions"
 CONFIG_FILE = WNVM_DIR / "config.json"
@@ -217,7 +219,6 @@ def remove(version: str):
 
 
 GITHUB_REPO = "dkuwcreator/win-nvm"
-VERSION_FILE = Path(__file__).parent / ".version"
 
 def fetch_latest_version():
     """Retrieve the latest version from GitHub releases."""
@@ -232,18 +233,12 @@ def fetch_latest_version():
 @app.command()
 def version():
     """Show the wnvm CLI version and check for updates."""
-    # Read local version
-    if VERSION_FILE.exists():
-        local_version = VERSION_FILE.read_text().strip()
-    else:
-        local_version = "Unknown"
-
-    typer.echo(f"wnvm version {local_version}")
+    typer.echo(f"wnvm version {__version__ or 'dev'}")
 
     # Fetch the latest release from GitHub
     latest_version = fetch_latest_version()
 
-    if latest_version and latest_version != local_version:
+    if latest_version and latest_version != __version__:
         typer.echo(f"⚠ A new version ({latest_version}) is available!")
         typer.echo("Update by running:")
         typer.echo("  iwr -useb https://raw.githubusercontent.com/dkuwcreator/win-nvm/main/install.ps1 | iex")

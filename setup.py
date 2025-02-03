@@ -12,11 +12,17 @@ config = dotenv_values("project.env")
 PROJECT_NAME = config.get("PROJECT_NAME", "example_project")
 ENTRY_SCRIPT = config.get("ENTRY_SCRIPT", "example_project")
 OUTPUT_NAME = config.get("OUTPUT_NAME", "example_project")
-VERSION = config.get("VERSION", "0.0.1")
 AUTHOR = config.get("AUTHOR", "John Doe")
 AUTHOR_EMAIL = config.get("AUTHOR_EMAIL", "john.doe@example.com")
 DESCRIPTION = config.get("DESCRIPTION", "An example project description.")
 URL = config.get("URL", "https://example.com")
+
+# Read version from wnvm/.version file
+version_file_path = Path(".version")
+if version_file_path.is_file():
+    VERSION = version_file_path.read_text().strip()
+else:
+    VERSION = "dev"  # Fallback version
 
 # Read long description from README.md
 with open("README.md", "r", encoding="utf-8") as fh:

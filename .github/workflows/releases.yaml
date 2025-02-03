@@ -26,7 +26,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Write Version File
-        run: echo "${{ github.ref_name }}" > wnvm/.version
+        run: echo "${{ github.ref_name }}" > .version
 
       - name: Run build script
         run: |
