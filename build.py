@@ -39,12 +39,14 @@ def inject_version():
     if version == "Unknown":
         return
 
-    original_code = SOURCE_FILE.read_text()
-    updated_code = original_code.replace(
-        '__version__ = "dev"', f'__version__ = "{version}"'
-    )
+    # Read with UTF-8 encoding
+    original_code = SOURCE_FILE.read_text(encoding="utf-8")
 
-    SOURCE_FILE.write_text(updated_code)
+    # Replace placeholder
+    updated_code = original_code.replace('__version__ = "dev"', f'__version__ = "{version}"')
+
+    # Write back with UTF-8 encoding
+    SOURCE_FILE.write_text(updated_code, encoding="utf-8")
 
 
 def clean():
