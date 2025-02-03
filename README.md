@@ -1,8 +1,10 @@
 # win-nvm
 
-<!-- **Author:** Derk Kappelle
-**Email:** [derk.kappelle@uw-api.com](mailto:derk.kappelle@uw-api.com)
-**Repository:** [GitHub - win-nvm](https://github.com/dkuwcreator/win-nvm.git) -->
+<!-- 
+**Author:** Derk Kappelle  
+**Email:** [derk.kappelle@uw-api.com](mailto:derk.kappelle@uw-api.com)  
+**Repository:** [GitHub - win-nvm](https://github.com/dkuwcreator/win-nvm.git) 
+-->
 
 ## Description
 
@@ -70,11 +72,18 @@ If you want to build `win-nvm` yourself:
 ```sh
 git clone https://github.com/dkuwcreator/win-nvm.git
 cd win-nvm
-pip install -r requirements.txt
-python build.py --clean
+python build.py
 ```
 
 The executable will be available in the `dist/` folder.
+
+For **CI/CD builds**, run:
+
+```sh
+python build.py --ci --clean
+```
+
+This skips virtual environment setup for faster builds.
 
 ## Usage
 
@@ -155,17 +164,25 @@ python wnvm/cli.py --help
 To create a standalone executable using `build.py`:
 
 ```sh
-python build.py --clean
+python build.py
 ```
 
 The built executable will be available in the `dist/` directory.
+
+For **CI/CD builds**, run:
+
+```sh
+python build.py --ci --clean
+```
+
+This skips virtual environment setup for faster execution.
 
 ### **Build System Details**
 
 The `build.py` script ensures:
 
 - A clean build by removing previous artifacts.
-- A virtual environment is created if not already present.
+- A virtual environment is created if not already present (for local builds).
 - Dependencies are installed automatically.
 - The executable is built using `pyinstaller`.
 
