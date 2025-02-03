@@ -25,14 +25,14 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Write Version File
+        run: echo "${{ github.ref_name }}" > wnvm/.version
+
       - name: Run build script
         run: |
           python build.py --ci --clean
         shell: cmd
-
-      - name: Write Version File
-        run: echo "${{ github.ref_name }}" > wnvm/.version
-      
+     
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
