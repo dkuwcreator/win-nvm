@@ -31,7 +31,7 @@ def clean():
     for path in [build_dir, DIST_DIR, spec_file]:
         if path.exists():
             shutil.rmtree(path) if path.is_dir() else path.unlink()
-    print("✔ Cleaned previous build artifacts.")
+    print("Cleaned previous build artifacts.")
 
 def setup_venv():
     """Ensure a virtual environment exists and install dependencies (for local builds)."""
@@ -65,7 +65,7 @@ def build(
     # Determine which Python executable to use
     python_exec = "python" if ci else str(PYTHON_EXECUTABLE)
 
-    print(f"🚀 Building {OUTPUT_NAME} for {platform.system()}...")
+    print(f"Building {OUTPUT_NAME} for {platform.system()}...")
     cmd = [
         python_exec,
         "-m",
@@ -80,7 +80,7 @@ def build(
         subprocess.run(cmd, check=True)
         print(f"✔ Build completed. Executable is in the '{DIST_DIR}' folder.")
     except subprocess.CalledProcessError as e:
-        print("❌ Error: Build process failed.")
+        print("Error: Build process failed.")
         raise e
 
 if __name__ == "__main__":
