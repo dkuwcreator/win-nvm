@@ -78,7 +78,7 @@ def build(
 
     try:
         subprocess.run(cmd, check=True)
-        print(f"✔ Build completed. Executable is in the '{DIST_DIR}' folder.")
+        print(f"Build completed. Executable is in the '{DIST_DIR}' folder.")
     except subprocess.CalledProcessError as e:
         print("Error: Build process failed.")
         raise e
