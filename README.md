@@ -1,9 +1,8 @@
 # win-nvm
 
-**Version:** 0.1.0  
-**Author:** Derk Kappelle  
+<!-- **Author:** Derk Kappelle  
 **Email:** [derk.kappelle@uw-api.com](mailto:derk.kappelle@uw-api.com)  
-**Repository:** [GitHub - win-nvm](https://github.com/dkuwcreator/windows-nvm.git)
+**Repository:** [GitHub - win-nvm](https://github.com/dkuwcreator/win-nvm.git) -->
 
 ## Description
 
@@ -32,7 +31,7 @@
 The easiest way to install `win-nvm` is using the provided PowerShell script:
 
 ```powershell
-iwr -useb https://raw.githubusercontent.com/dkuwcreator/windows-nvm/main/install.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/dkuwcreator/win-nvm/main/install.ps1 | iex
 ```
 
 This will:
@@ -52,15 +51,15 @@ install.ps1 -Uninstall
 
 ### **Manual Installation**
 Alternatively, you can download the latest release manually:
-1. **Download the latest release** from [GitHub Releases](https://github.com/dkuwcreator/windows-nvm/releases/latest).
+1. **Download the latest release** from [GitHub Releases](https://github.com/dkuwcreator/win-nvm/releases/latest).
 2. **Extract the `wnvm.exe`** to a location of your choice (e.g., `C:\Users\YourName\wnvm`).
 3. **Add the folder to your Windows PATH** manually.
 
 ### **Building from Source**
 If you want to build `win-nvm` yourself:
 ```sh
-git clone https://github.com/dkuwcreator/windows-nvm.git
-cd windows-nvm
+git clone https://github.com/dkuwcreator/win-nvm.git
+cd win-nvm
 pip install -r requirements.txt
 python build.py --clean
 ```
@@ -118,8 +117,8 @@ wnvm remove 16.13.0
 
 ### **Setting Up a Development Environment**
 ```sh
-git clone https://github.com/dkuwcreator/windows-nvm.git
-cd windows-nvm
+git clone https://github.com/dkuwcreator/win-nvm.git
+cd win-nvm
 pip install -r requirements.txt
 ```
 
@@ -156,5 +155,5 @@ Contributions are welcome! Please fork the repository, create a feature branch, 
 This project is licensed under the **MIT License**.
 
 ---
-For more details, visit the [GitHub Repository](https://github.com/dkuwcreator/windows-nvm.git).
+For more details, visit the [GitHub Repository](https://github.com/dkuwcreator/win-nvm.git).
 
