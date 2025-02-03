@@ -1,23 +1,17 @@
 # Parse command-line arguments
 param (
-    [string]$UserPath = "dist",
+    [string]$UserPath = "",  # Allow empty, so it defaults to a logical location
     [switch]$Uninstall
 )
 
-# Load environment variables from .env if available
-$envFilePath = "project.env"
-if (Test-Path $envFilePath) {
-    Get-Content $envFilePath | ForEach-Object {
-        $var = $_ -split '=', 2
-        if ($var.Length -eq 2) {
-            Set-Item -Path "Env:$($var[0].Trim())" -Value $var[1].Trim()
-        }
-    }
-}
+# Constants
+$OUTPUT_NAME = "wnvm"
+$DEFAULT_INSTALL_DIR = Join-Path $env:LOCALAPPDATA $OUTPUT_NAME  # Logical install location
+$DOWNLOAD_URL = "https://github.com/dkuwcreator/win-nvm/releases/latest/download/wnvm.exe"
 
-# Constants (Loaded from .env or default values)
-$OUTPUT_NAME = $env:OUTPUT_NAME ?? "example"
-$DIST_DIR = $env:DIST_DIR ?? "dist"
+# Determine installation directory
+$INSTALL_DIR = if ($UserPath) { $UserPath } else { $DEFAULT_INSTALL_DIR }
+$EXECUTABLE_PATH = Join-Path $INSTALL_DIR "$OUTPUT_NAME.exe"
 
 # Function to update PATH environment variable
 function Update-Path {
@@ -28,7 +22,6 @@ function Update-Path {
     
     $userPath = [System.Environment]::GetEnvironmentVariable("PATH", "User")
     if (-not $userPath) {
-        Write-Host "User PATH environment variable not found. Using an empty PATH."
         $userPath = ""
     }
 
@@ -38,8 +31,6 @@ function Update-Path {
             $newPath = ($userPath -split ";" | Where-Object {$_ -ne $TargetPath}) -join ";"
             [System.Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
             Write-Host "Removed $TargetPath from PATH. Restart your terminal or system for changes to take effect."
-        } else {
-            Write-Host "$TargetPath not found in PATH. Skipping removal."
         }
     } else {
         if ($userPath -notmatch [regex]::Escape($TargetPath)) {
@@ -47,76 +38,51 @@ function Update-Path {
             $newPath = if ($userPath) { "$userPath;$TargetPath" } else { $TargetPath }
             [System.Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
             Write-Host "Added $TargetPath to PATH. Restart your terminal or system for changes to take effect."
-        } else {
-            Write-Host "$TargetPath is already in PATH. Skipping addition."
         }
     }
 }
 
 # Function to install the executable
 function Install-App {
-    param (
-        [string]$UserPath = $DIST_DIR
-    )
-
-    # Resolve absolute path
-    $destPath = Resolve-Path -ErrorAction SilentlyContinue $UserPath
-    if (-not $destPath) {
-        New-Item -ItemType Directory -Path $UserPath -Force | Out-Null
-        $destPath = Resolve-Path $UserPath
+    # Ensure the installation directory exists
+    if (-not (Test-Path $INSTALL_DIR)) {
+        New-Item -ItemType Directory -Path $INSTALL_DIR -Force | Out-Null
     }
-
-    $executable = "$DIST_DIR\$OUTPUT_NAME.exe"
-    if (-not (Test-Path $executable)) {
-        Write-Host "Error: Executable not found in '$DIST_DIR'. Run the build step first."
+    
+    # Download the executable
+    Write-Host "Downloading $OUTPUT_NAME from GitHub..."
+    Invoke-WebRequest -Uri $DOWNLOAD_URL -OutFile $EXECUTABLE_PATH -UseBasicParsing
+    
+    if (Test-Path $EXECUTABLE_PATH) {
+        Write-Host "$OUTPUT_NAME successfully installed to $INSTALL_DIR"
+    } else {
+        Write-Host "Failed to download $OUTPUT_NAME. Check your network connection."
         exit 1
     }
 
-    # Check if the source and destination paths are the same
-    if ($executable -ne "$destPath\$OUTPUT_NAME.exe") {
-        # Copy the executable to the destination path
-        Copy-Item -Path $executable -Destination $destPath -Force
-        Write-Host "Installed $OUTPUT_NAME to $destPath."
-    } else {
-        Write-Host "$OUTPUT_NAME is already in the destination path. Skipping copy."
-    }
-
     # Add directory to PATH
-    Update-Path -TargetPath $destPath
-
-    # Update current session's PATH
-    $env:PATH = "$env:PATH;$destPath"
+    Update-Path -TargetPath $INSTALL_DIR
+    $env:PATH = "$env:PATH;$INSTALL_DIR"
     Write-Host "Installation complete. You may need to restart your terminal for PATH changes to take effect."
 }
 
 # Function to uninstall the executable
 function Uninstall-App {
-    param (
-        [string]$UserPath = $DIST_DIR
-    )
-
-    $destPath = Resolve-Path -ErrorAction SilentlyContinue $UserPath
-    if (-not $destPath) {
-        Write-Host "Error: Directory $UserPath does not exist. Skipping uninstallation."
-        return
-    }
-
-    $executable = "$destPath\$OUTPUT_NAME.exe"
-    if (Test-Path $executable) {
-        Remove-Item -Path $executable -Force
-        Write-Host "Removed $OUTPUT_NAME from $destPath."
+    if (Test-Path $EXECUTABLE_PATH) {
+        Remove-Item -Path $EXECUTABLE_PATH -Force
+        Write-Host "Removed $OUTPUT_NAME from $INSTALL_DIR."
     } else {
-        Write-Host "Executable not found in $destPath. Skipping removal."
+        Write-Host "$OUTPUT_NAME not found in $INSTALL_DIR. Skipping removal."
     }
-
+    
     # Remove directory from PATH
-    Update-Path -TargetPath $destPath -Remove
+    Update-Path -TargetPath $INSTALL_DIR -Remove
 }
 
 if ($Uninstall) {
-    Uninstall-App -UserPath $UserPath
+    Uninstall-App
 } else {
-    Install-App -UserPath $UserPath
+    Install-App
 }
 
 # Ensure PATH updates reflect immediately in the session
