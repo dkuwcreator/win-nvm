@@ -15,15 +15,6 @@ ENTRY_SCRIPT = config.get("ENTRY_SCRIPT", "example/cli.py")
 OUTPUT_NAME = config.get("OUTPUT_NAME", "example_output")
 DIST_DIR = config.get("DIST_DIR", "dist")
 
-# Define the version (ideally, retrieve it dynamically from tags)
-VERSION = "0.0.0"  # This will be replaced by the build pipeline
-
-# Write the version to a file
-version_file = Path("wnvm/.version")
-version_file.write_text(VERSION)
-
-print(f"✔ Wrote version {VERSION} to {version_file}")
-
 app = typer.Typer()
 
 
