@@ -6,7 +6,7 @@ param (
 
 # Constants
 $OUTPUT_NAME = "wnvm"
-$DEFAULT_INSTALL_DIR = Join-Path $env:LOCALAPPDATA $OUTPUT_NAME  # Logical install location
+$DEFAULT_INSTALL_DIR = Join-Path $env:USERPROFILE $OUTPUT_NAME  # Logical install location
 $DOWNLOAD_URL = "https://github.com/dkuwcreator/win-nvm/releases/latest/download/wnvm.exe"
 
 # Determine installation directory

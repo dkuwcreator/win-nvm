@@ -17,7 +17,7 @@ WNVM_DIR = Path.home() / "wnvm"
 VERSIONS_DIR = WNVM_DIR / "versions"
 CONFIG_FILE = WNVM_DIR / "config.json"
 NODE_BASE_URL = "https://nodejs.org/dist"
-WNVM__IDENTIFIER = "wnvm"
+WNVM_IDENTIFIER = "wnvm"
 
 # Ensure required directories exist
 WNVM_DIR.mkdir(exist_ok=True)
@@ -47,7 +47,7 @@ def update_user_path(new_node_path: Path):
         current_path, _ = winreg.QueryValueEx(key, "Path")
 
     # Remove old wnvm paths (if any)
-    new_path_entries = [p for p in current_path.split(";") if WNVM__IDENTIFIER not in p]
+    new_path_entries = [p for p in current_path.split(";") if WNVM_IDENTIFIER not in p]
 
     # Add new Node.js path at the beginning
     new_path_entries.insert(0, str(new_node_path))
