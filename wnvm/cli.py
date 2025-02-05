@@ -1,5 +1,6 @@
 import json
 import shutil
+import sys
 import requests
 import zipfile
 import subprocess
@@ -13,7 +14,7 @@ app = typer.Typer()
 
 __version__ = "dev"  # Placeholder, will be replaced by build.py
 
-WNVM_DIR = Path.home() / "wnvm"
+WNVM_DIR = sys.executable
 VERSIONS_DIR = WNVM_DIR / "versions"
 CONFIG_FILE = WNVM_DIR / "config.json"
 NODE_BASE_URL = "https://nodejs.org/dist"
